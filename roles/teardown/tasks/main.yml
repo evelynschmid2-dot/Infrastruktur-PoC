@@ -1,0 +1,72 @@
+---
+# Remove installed apps and settings like dark mode
+- name: Remove third-party apps
+  apt:
+    name:
+      - microsoft-edge-stable
+      - code
+      - terraform
+      - pritunl-client-electron
+    state: absent
+    purge: true
+
+- name: Remove standard apt packages
+  apt:
+    name:
+      - docker.io
+      - ansible
+      - libreoffice
+      - fzf
+      - fastfetch
+      - tree
+      - git
+      - curl
+    state:  absent
+    purge:  true
+
+#Remove repository files
+- name: Remove third-party apt repositories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/microsoft-edge.list
+    - /etc/apt/sources.list.d/vscode.list
+    - /etc/apt/sources.list.d/hashicorp.list
+    - /etc/apt/sources.list.d/pritunl.list
+
+#Remove keyring files
+- name: Remove keyring files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/keyrings/microsoft.asc
+    - /etc/apt/keyrings/hashicorp.asc
+    - /etc/apt/keyrings/pritunl.asc
+
+#Clean up orphand dependencies
+- name: Autoremove unused packages
+  apt:
+    autoremove: true
+    purge: true
+
+#Reset GNOME color scheme to default (light-mode)
+- name: Reset GNOME color scheme to default
+  become_user: "{{ ansible_user }}"
+  command: gsettings reset org.gnome.desktop.interface color-scheme
+
+
+#Reset GNOME wallpaper file
+- name: Reset wallpaper file
+  file:
+    path: "/home/{{ ansible_user }}/Pictures/PE.png"
+    state: absent
+
+
+- name: Reset GNOME wallpaper settings
+  become_user: "{{ ansible_user }}"
+  command: "{{ item }}"
+  loop:
+    - gsettings reset org.gnome.desktop.background picture-uri-dark
+    - gsettings reset org.gnome.desktop.background picture-uri

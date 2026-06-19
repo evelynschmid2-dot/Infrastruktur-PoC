@@ -1,0 +1,8 @@
+---
+- name: Setup Digitec Linux device
+  hosts: ubuntu
+  become: true
+
+  roles:
+    - appearance
+    - apps

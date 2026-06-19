@@ -1,0 +1,91 @@
+---
+# Ensure keyrings dir exists
+- name: Ensure /etc/apt/keyrings exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+# Microsoft Edge + VS Code (both use Microsoft repo)
+- name: Download Microsoft GPG key
+  get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /etc/apt/keyrings/microsoft.asc
+    mode: '0644'
+
+- name: Add Microsoft Edge repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.asc] https://packages.microsoft.com/repos/edge stable main"
+    state: present
+    filename: microsoft-edge
+
+- name: Add VS Code repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.asc] https://packages.microsoft.com/repos/code stable main"
+    state: present
+    filename: vscode
+
+- name: Install Microsoft Edge and VS Code
+  apt:
+    name:
+      - microsoft-edge-stable
+      - code
+    state: present
+    update_cache: true
+
+# HashiCorp (Terraform)
+- name: Download HashiCorp GPG key
+  get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /etc/apt/keyrings/hashicorp.asc
+    mode: '0644'
+
+- name: Add HashiCorp repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com noble main"
+    state: present
+    filename: hashicorp
+
+- name: Install Terraform
+  apt:
+    name: terraform
+    state: present
+    update_cache: true
+
+# Pritunl VPN
+- name: Download Pritunl GPG key
+  get_url:
+    url: https://raw.githubusercontent.com/pritunl/pgp/master/pritunl_repo_pub.asc
+    dest: /etc/apt/keyrings/pritunl.asc
+    mode: '0644'
+
+- name: Add Pritunl repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/pritunl.asc] https://repo.pritunl.com/stable/apt noble main"
+    state: present
+    filename: pritunl
+
+- name: Install Pritunl client
+  apt:
+    name: pritunl-client-electron
+    state: present
+    update_cache: true
+
+# Standard apt packages
+- name: Install standard apps from Ubuntu repos
+  apt:
+    name:
+      - docker.io
+      - ansible
+      - git
+      - libreoffice
+      - fzf
+      - htop
+      - fastfetch
+      - tree
+      - curl
+    state: present
+    update_cache: true
+
+# MS Teams runs as a PWA via Edge
+# After first login install via Edge address bar -> "Install Teams as app"

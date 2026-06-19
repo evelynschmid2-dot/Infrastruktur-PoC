@@ -1,0 +1,19 @@
+---
+- name: SET GNOME color scheme to dark
+  become_user: "{{ ansible_user }}"
+  command: gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
+- name: Copy wallpaper to Ubuntu
+  copy:
+    src: images/PE.png
+    dest: "/home/{{ ansible_user }}/Pictures/PE.png"
+    owner: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: SET GNOME wallpaper (dark mode)
+  become_user: "{{ ansible_user }}"
+  command: gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/{{ ansible_user }}/Pictures/PE.png"
+
+- name: SET GNOME wallpaper (light mode)
+  become_user: "{{ ansible_user }}"
+  command: gsettings set org.gnome.desktop.background picture-uri "file:///home/{{ ansible_user }}/Pictures/PE.png"

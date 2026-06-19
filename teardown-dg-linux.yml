@@ -1,0 +1,7 @@
+---
+- name: Teardown Digitec Linux device (undo what setup did)
+  hosts: ubuntu
+  become: true
+
+  roles:
+    - teardown
